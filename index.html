@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Configuración de metadatos del documento -->
+    <meta charset="UTF-8">
+    <!-- Asegura la correcta visualización en dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título de la página que aparece en la pestaña del navegador -->
+    <title>Examen Final - Módulo II Instrumentación de Edificios</title>
+    
+    <!-- Inclusión de Tailwind CSS para un diseño rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Estilos CSS personalizados -->
+    <style>
+        /* Importación de la fuente 'Inter' desde Google Fonts para un aspecto moderno */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #00448D, #002D6C);
+        }
+        
+        .btn-primary {
+            background-color: #00448D;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #003366;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00448D;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        <div id="main-card" class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+            <div id="header" class="gradient-bg p-6 text-white">
+                <h1 class="text-2xl sm:text-3xl font-bold">Examen Final - Módulo II Instrumentación de Edificios</h1>
+                <p class="mt-2 text-sm sm:text-base opacity-90">Evaluación de conocimientos sobre Instrumentación y Control.</p>
+            </div>
+
+            <div id="content-area" class="p-6 sm:p-8">
+
+                <div id="start-view">
+                    <h2 class="text-xl font-semibold mb-4">Información del Estudiante</h2>
+                    <p class="mb-6 text-gray-600">Por favor, completa tus datos para comenzar el examen.</p>
+                    <form id="user-info-form">
+                        <div class="mb-4">
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                            <input type="text" id="firstName" name="firstName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                            <input type="text" id="lastName" name="lastName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                            Comenzar Examen
+                        </button>
+                    </form>
+                </div>
+
+                <div id="quiz-view" class="hidden">
+                    <div class="flex justify-between items-center mb-4 flex-wrap">
+                        <div class="w-full sm:w-auto mb-2 sm:mb-0">
+                            <h2 class="text-xl font-bold">Pregunta <span id="question-number"></span> de <span id="total-questions"></span></h2>
+                        </div>
+                        <div class="flex items-center bg-gray-200 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="timer">00:00</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+
+                    <div id="question-container" class="mb-6">
+                        <p id="question-text" class="text-lg mb-6"></p>
+                        <div id="options-container" class="space-y-3"></div>
+                    </div>
+
+                    <div class="flex justify-between mt-8">
+                        <button id="prev-btn" class="btn-secondary text-white font-bold py-2 px-6 rounded-lg">Anterior</button>
+                        <button id="next-btn" class="btn-primary text-white font-bold py-2 px-6 rounded-lg">Siguiente</button>
+                    </div>
+                </div>
+                
+                <div id="evaluating-view" class="hidden text-center">
+                    <h2 class="text-2xl font-semibold mb-4">Evaluando tus respuestas...</h2>
+                    <p class="mb-6 text-gray-600">Por favor, espera un momento.</p>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="eval-progress-bar" class="bg-blue-600 h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="results-view" class="hidden">
+                    <h2 class="text-3xl font-bold text-center mb-2">¡Examen Completado!</h2>
+                    <p class="text-center text-gray-600 mb-6">Este es el resumen de tu desempeño.</p>
+                    
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg mb-8 text-center">
+                        <p class="font-bold text-lg">Puntuación Final</p>
+                        <p class="text-5xl font-extrabold"><span id="final-score"></span>%</p>
+                    </div>
+                    
+                    <div id="feedback-container">
+                        <h3 class="text-xl font-semibold mb-4">Revisión de Preguntas</h3>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                         <p id="save-status" class="text-sm font-semibold mt-4"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
+            <h3 class="text-xl font-bold mb-4">Confirmar Finalización</h3>
+            <p class="text-gray-600 mb-6">¿Estás seguro de que deseas finalizar el examen?</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-finish-btn" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                <button id="confirm-finish-btn" class="btn-primary text-white font-bold py-2 px-4 rounded-lg">Finalizar y Evaluar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const questions = [
+            // --- CLASE I ---
+            { question: "1. ¿Cuál es la principal diferencia entre un sistema de control de lazo abierto y uno de lazo cerrado?", weight: 6, options: ["El lazo abierto utiliza más sensores.", "El lazo cerrado no puede ser controlado por un temporizador.", "El lazo cerrado utiliza la salida del proceso (retroalimentación) para ajustar la acción de control.", "El lazo abierto es más costoso de implementar."], correct: 2, rationale: "¡Correcto! La retroalimentación (feedback) es la característica fundamental de un lazo cerrado, permitiéndole corregir desviaciones." },
+            { question: "2. Si un sistema de control PID presenta oscilaciones constantes sin estabilizarse en el setpoint, ¿cuál es el problema más probable?", weight: 7, options: ["El componente proporcional (P) es demasiado bajo.", "El sistema está mal sintonizado, posiblemente con una ganancia proporcional (P) muy alta.", "Falta el componente derivativo (D).", "El actuador es de acción directa en lugar de inversa."], correct: 1, rationale: "¡Correcto! Una ganancia proporcional excesiva es una causa común de oscilaciones (hunting) en un sistema PID." },
+            { question: "3. En un sistema de climatización, se define una acción de control INVERSA. Si la temperatura de la sala (variable controlada) sube por encima del setpoint, ¿qué acción debe tomar el controlador sobre la válvula de agua helada (elemento final)?", weight: 7, options: ["Cerrar la válvula.", "Mantener la posición actual.", "Abrir más la válvula.", "Enviar una alarma pero no actuar."], correct: 2, rationale: "¡Correcto! En una acción inversa (para enfriamiento), a medida que la variable (temperatura) aumenta, la salida del controlador también debe aumentar para abrir más la válvula y enfriar el espacio." },
+            { question: "4. ¿Qué es una 'Secuencia de Operación'?", weight: 6, options: ["El diagrama eléctrico del tablero de control.", "La lista de materiales y equipos a instalar.", "La narrativa que describe cómo debe funcionar un sistema bajo diferentes condiciones.", "El manual de mantenimiento del fabricante."], correct: 2, rationale: "¡Correcto! Es el documento clave que define la lógica de control que el programador debe implementar." },
+            { question: "5. Al seleccionar un controlador, se recomienda dejar un 20% de I/O (Entradas/Salidas) de reserva. ¿Cuál es la razón principal de esta práctica?", weight: 7, options: ["Para cumplir con una norma de seguridad eléctrica.", "Para prever futuras ampliaciones o modificaciones del sistema sin cambiar el hardware.", "Para reducir el costo inicial del controlador.", "Para aumentar la velocidad de procesamiento del controlador."], correct: 1, rationale: "¡Correcto! Esta práctica de ingeniería asegura la escalabilidad y flexibilidad del sistema a futuro." },
+            // --- CLASE II ---
+            { question: "6. ¿Cuál es la principal ventaja de utilizar una señal de corriente de 4-20mA en lugar de una de 0-10VDC para un sensor?", weight: 7, options: ["Es más barata de instalar.", "Permite detectar una rotura del cable (la corriente cae a 0mA) y es menos susceptible a la interferencia electromagnética.", "Es el único tipo de señal compatible con controladores modernos.", "Requiere menos hilos para su conexión."], correct: 1, rationale: "¡Correcto! El 'cero vivo' (4mA) y la inmunidad al ruido son las ventajas clave de las señales de corriente." },
+            { question: "7. Si un pulsador de parada de emergencia se conecta a una entrada digital, ¿qué tipo de contacto se debe utilizar por seguridad?", weight: 7, options: ["Normalmente Abierto (NO).", "Normalmente Cerrado (NC).", "Conmutable (SPDT).", "No importa el tipo de contacto."], correct: 1, rationale: "¡Correcto! Se usa NC para que, si el cable se corta, el circuito se abra y el sistema se detenga, garantizando una condición segura ante fallos." },
+            { question: "8. Un actuador de válvula tiene la especificación 'FO' (Fail Open). ¿Qué hará el actuador si se corta la alimentación eléctrica?", weight: 6, options: ["Se quedará en su última posición.", "Se cerrará completamente.", "Se abrirá completamente.", "Modulará al 50% de su recorrido."], correct: 2, rationale: "¡Correcto! FO (Fail Open) o Falla Abierto significa que el actuador está diseñado para abrir la válvula en caso de pérdida de energía." },
+            { question: "9. ¿Qué es un 'Gateway' o pasarela en una red de automatización?", weight: 7, options: ["El servidor principal donde se aloja el SCADA.", "Un dispositivo que traduce protocolos de comunicación diferentes (ej. BACnet a Modbus).", "Un repetidor para ampliar la distancia de una red.", "El punto de acceso a internet de la red."], correct: 1, rationale: "¡Correcto! Su función es actuar como un 'traductor' para permitir la interoperabilidad entre sistemas que no hablan el mismo 'idioma'." },
+            { question: "10. ¿Qué significa 'escalar' una señal analógica?", weight: 7, options: ["Aumentar el voltaje de la señal.", "Convertir una señal digital en analógica.", "Establecer la relación matemática entre la señal eléctrica (ej. 4-20mA) y la variable física que representa (ej. 0-100 psi).", "Filtrar el ruido de la señal."], correct: 2, rationale: "¡Correcto! El escalamiento es fundamental para que el controlador interprete correctamente el valor medido por el sensor." },
+            // --- CLASE III ---
+            { question: "11. ¿Cuál es la diferencia fundamental entre un sensor activo y uno pasivo?", weight: 6, options: ["Los sensores activos son siempre más precisos.", "Los sensores pasivos no necesitan una fuente de alimentación externa para generar su señal.", "Los sensores activos no necesitan una fuente de alimentación externa para generar su señal.", "Los sensores pasivos son únicamente para señales digitales."], correct: 2, rationale: "¡Correcto! Los sensores activos (ej. termoeléctricos) generan su propia señal, mientras que los pasivos (ej. termistores) necesitan una fuente auxiliar." },
+            { question: "12. Un sensor de temperatura tiene una precisión de ±0.5°C y una resolución de 0.1°C. ¿Qué significa esto?", weight: 7, options: ["El sensor puede medir cambios de 0.5°C y su valor estará a 0.1°C del valor real.", "El valor medido estará dentro de un rango de 0.5°C del valor real, y el sensor puede detectar cambios tan pequeños como 0.1°C.", "La precisión y la resolución son lo mismo.", "El sensor solo puede medir en incrementos de 0.5°C."], correct: 1, rationale: "¡Correcto! La precisión indica qué tan cerca está la lectura del valor real, y la resolución es el cambio más pequeño que el sensor puede detectar." },
+            { question: "13. ¿Para qué se utiliza el grado de protección IP (Ingress Protection) en un instrumento?", weight: 6, options: ["Para indicar su protocolo de comunicación.", "Para clasificar su nivel de ciberseguridad.", "Para indicar su grado de protección contra la entrada de sólidos (polvo) y líquidos (agua).", "Para definir su rango de temperatura de operación."], correct: 2, rationale: "¡Correcto! El código IP (ej. IP65) define cuán protegido está el equipo contra factores ambientales." },
+            { question: "14. En un sistema de ventilación por demanda en un estacionamiento, ¿qué tipo de sensor es el principal para modular la velocidad de los extractores?", weight: 7, options: ["Sensor de Temperatura.", "Sensor de Humedad.", "Sensor de Monóxido de Carbono (CO).", "Detector de Presencia."], correct: 2, rationale: "¡Correcto! El nivel de CO es el indicador directo de la contaminación por vehículos, y se usa para controlar la ventilación de forma eficiente." },
+            { question: "15. ¿Qué significa la clasificación NEMA 4X para un tablero o envolvente?", weight: 7, options: ["Solo para uso interior, protegido contra polvo.", "Para uso interior o exterior, protegido contra lluvia y polvo.", "Para uso interior o exterior, protegido contra chorros de agua y corrosión.", "Para uso en áreas con riesgo de explosión."], correct: 2, rationale: "¡Correcto! NEMA 4 indica protección contra agua a presión (chorros), y la 'X' añade la protección contra la corrosión." }
+        ];
+        
+        // --- VARIABLES DE ESTADO Y CONFIGURACIÓN ---
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let userInfo = {};
+        let timerInterval;
+        let secondsElapsed = 0;
+        const totalPoints = 100; // Puntuación total es 100%
+        const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbwVxOnxvMH35d_sxsMVDDKEpLqOMCF25GzRx_u6EjxmIRFFA9QjaA15HN8wBfemCmR0Sw/exec';
+
+        // --- REFERENCIAS A ELEMENTOS DEL DOM ---
+        const startView = document.getElementById('start-view');
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const evaluatingView = document.getElementById('evaluating-view');
+        const confirmModal = document.getElementById('confirm-modal');
+        const userInfoForm = document.getElementById('user-info-form');
+        const questionNumberEl = document.getElementById('question-number');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const progressBar = document.getElementById('progress-bar');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const timerEl = document.getElementById('timer');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const confirmFinishBtn = document.getElementById('confirm-finish-btn');
+        const cancelFinishBtn = document.getElementById('cancel-finish-btn');
+        const finalScoreEl = document.getElementById('final-score');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const saveStatusEl = document.getElementById('save-status');
+
+        // --- FUNCIONES PRINCIPALES DEL EXAMEN ---
+
+        function startQuiz() {
+            userInfo = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value
+            };
+            startView.classList.add('hidden');
+            quizView.classList.remove('hidden');
+            startTimer();
+            totalQuestionsEl.textContent = questions.length;
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function loadQuestion(index) {
+            const question = questions[index];
+            questionNumberEl.textContent = index + 1;
+            questionTextEl.innerHTML = `<span class="font-semibold">${question.question}</span> <span class="text-sm font-normal text-gray-500">(${question.weight}% del total)</span>`;
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, i) => {
+                const isChecked = userAnswers[index] === i;
+                const optionId = `q${index}_option${i}`;
+                const optionElement = document.createElement('label');
+                optionElement.htmlFor = optionId;
+                optionElement.className = `flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${isChecked ? 'bg-blue-100 border-blue-500 ring-2 ring-blue-500' : 'border-gray-300 hover:border-blue-400'}`;
+                optionElement.innerHTML = `
+                    <input type="radio" id="${optionId}" name="question${index}" value="${i}" class="hidden">
+                    <span class="w-5 h-5 mr-4 flex-shrink-0 rounded-full border-2 flex items-center justify-center ${isChecked ? 'border-blue-600' : 'border-gray-400'}">
+                        ${isChecked ? '<span class="w-2.5 h-2.5 bg-blue-600 rounded-full"></span>' : ''}
+                    </span>
+                    <span class="text-gray-800">${option}</span>
+                `;
+                optionElement.addEventListener('click', () => selectAnswer(index, i));
+                optionsContainer.appendChild(optionElement);
+            });
+            updateNavigation();
+            updateProgressBar();
+        }
+        
+        function selectAnswer(questionIndex, answerIndex) {
+            userAnswers[questionIndex] = answerIndex;
+            loadQuestion(questionIndex);
+        }
+
+        function updateNavigation() {
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = 'Finalizar';
+            } else {
+                nextBtn.textContent = 'Siguiente';
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function navigateQuestion(direction) {
+            if (direction === 1 && currentQuestionIndex === questions.length - 1) {
+                showConfirmationModal();
+                return;
+            }
+            currentQuestionIndex += direction;
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                timerEl.textContent = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        function showConfirmationModal() {
+            confirmModal.classList.remove('hidden');
+        }
+
+        function hideConfirmationModal() {
+            confirmModal.classList.add('hidden');
+        }
+
+        function finishExam() {
+            hideConfirmationModal();
+            clearInterval(timerInterval);
+            quizView.classList.add('hidden');
+            evaluatingView.classList.remove('hidden');
+            const evalProgressBar = document.getElementById('eval-progress-bar');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                evalProgressBar.style.width = `${progress}%`;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        evaluatingView.classList.add('hidden');
+                        calculateAndShowResults();
+                    }, 500);
+                }
+            }, 200);
+        }
+        
+        function calculateScore() {
+            return userAnswers.reduce((score, answer, index) => {
+                if (answer === questions[index].correct) {
+                    return score + questions[index].weight;
+                }
+                return score;
+            }, 0);
+        }
+
+        function calculateAndShowResults() {
+            const score = calculateScore();
+            finalScoreEl.textContent = score;
+            feedbackContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const userAnswerIndex = userAnswers[index];
+                const userAnswerText = userAnswerIndex !== null ? q.options[userAnswerIndex] : "No respondida";
+                const isCorrect = userAnswerIndex === q.correct;
+
+                const feedbackElement = document.createElement('div');
+                feedbackElement.className = `p-4 mb-4 rounded-lg border-l-4 ${isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`;
+                feedbackElement.innerHTML = `
+                    <p class="font-bold text-gray-800">${q.question}</p>
+                    <p class="mt-2 text-sm">Tu respuesta: <span class="font-semibold">${userAnswerText}</span></p>
+                    ${!isCorrect && userAnswerIndex !== null ? `<p class="mt-1 text-sm">Respuesta correcta: <span class="font-semibold">${q.options[q.correct]}</span></p>` : ''}
+                    <p class="mt-2 text-xs text-gray-600">${q.rationale}</p>
+                `;
+                feedbackContainer.appendChild(feedbackElement);
+            });
+            
+            resultsView.classList.remove('hidden');
+            sendDataToWebApp();
+        }
+
+        async function sendDataToWebApp() {
+            saveStatusEl.textContent = 'Procesando resultados y enviando notificación...';
+            saveStatusEl.className = 'text-sm font-semibold mt-4 text-gray-500';
+
+            const payload = {
+                sheetName: 'Resultados-ExamenFinal-M2-v1',
+                timestamp: new Date().toLocaleString('es-VE', { timeZone: 'America/Caracas' }),
+                firstName: userInfo.firstName,
+                lastName: userInfo.lastName,
+                email: userInfo.email,
+                score: calculateScore(),
+                totalPoints: 100,
+                timeTaken: formatTime(secondsElapsed),
+                answers: questions.map((q, i) => ({
+                    question: q.question,
+                    userAnswer: userAnswers[i] !== null ? q.options[userAnswers[i]] : "No respondida",
+                    correctAnswer: q.options[q.correct],
+                    isCorrect: userAnswers[i] === q.correct
+                }))
+            };
+
+            try {
+                const response = await fetch(gasWebAppUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    redirect: 'follow',
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                
+                saveStatusEl.textContent = 'Resultados enviados para su procesamiento. Recibirás una notificación por correo.';
+                saveStatusEl.className = 'text-sm font-semibold mt-4 text-green-600';
+
+            } catch (error) {
+                saveStatusEl.textContent = `Error en el envío automático. Por favor, reporta tu resultado manualmente.`;
+                saveStatusEl.className = 'text-sm font-semibold mt-4 text-red-600';
+                console.error('Error al enviar datos:', error);
+            }
+        }
+
+        userInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            startQuiz();
+        });
+        prevBtn.addEventListener('click', () => navigateQuestion(-1));
+        nextBtn.addEventListener('click', () => navigateQuestion(1));
+        confirmFinishBtn.addEventListener('click', finishExam);
+        cancelFinishBtn.addEventListener('click', hideConfirmationModal);
+
+    });
+</script>
+
+</body>
+</html>
